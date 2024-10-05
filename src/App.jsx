@@ -12,13 +12,13 @@ function App() {
   const [position,setPosition] = useState({row :'', col :'',started :false})
   const [currentLevel,setCurrentLevel] = useState({level : parseInt(localStorage.getItem('level')) ,completed : false} || {level :1, completed :false})
   const [location,setLocation] = useState(localStorage.getItem('col') || '')
+  // //console.log('the initial and sudokarr',initialSudoku,sudokuArr);
+  //console.log('the sudoku arr is',sudokuArr);
   
   const handleSudoku = (e,row,col)=>{
     let value = (e.target.value).replace(/[^1-9]/g,'') || -1;
    let grid = getDeepCopy(sudokuArr)
-   
     if(value  === -1 || (value  >=1 && value <=9)) {grid[row][col] = value }
-    
     setSudokuArr(grid)
     setPosition({row,col,started:true})
    
@@ -28,33 +28,33 @@ function App() {
   const  getReverseGeoLocation = async (position) => {
     const latitude = position.coords.latitude;
     const longitude = position.coords.longitude;
-    console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
+    //console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
 
     let res  = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`,{
     method :"GET"
   })
    if(res){
     let data = await res.json()
-    console.log('oooh the data is',data);
+    //console.log('oooh the data is',data);
     
     setLocation(data?.city)
     localStorage.setItem('col',data?.city)
    }
-  //console.log('res is',await res.json());
+  ////console.log('res is',await res.json());
   
 }
   
   function error() {
-  //  console.log("Unable to retrieve your location");
+  //  //console.log("Unable to retrieve your location");
   }
    
   useEffect(()=>{
-    //console.log('is navigator working',navigator);
+    ////console.log('is navigator working',navigator);
     
     if (navigator?.geolocation) {
       navigator.geolocation.getCurrentPosition(getReverseGeoLocation, error);
     } else {
-      //console.log("Geolocation not supported");
+      ////console.log("Geolocation not supported");
     
     }
     // if(navigator?.mediaDevices){

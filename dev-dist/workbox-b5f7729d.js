@@ -48,17 +48,17 @@ define(['exports'], (function (exports) { 'use strict';
           return;
         }
         if (method === 'groupCollapsed') {
-          // Safari doesn't print all console.groupCollapsed() arguments:
+          // Safari doesn't print all //console.groupCollapsed() arguments:
           // https://bugs.webkit.org/show_bug.cgi?id=182754
           if (/^((?!chrome|android).)*safari/i.test(navigator.userAgent)) {
-            console[method](...args);
+            //console[method](...args);
             return;
           }
         }
         const styles = [`background: ${methodToColorMap[method]}`, `border-radius: 0.5em`, `color: white`, `font-weight: bold`, `padding: 2px 0.5em`];
         // When in a group, the workbox prefix is not displayed.
         const logPrefix = inGroup ? [] : ['%cworkbox', styles.join(';')];
-        console[method](...logPrefix, ...args);
+        //console[method](...logPrefix, ...args);
         if (method === 'groupCollapsed') {
           inGroup = true;
         }
@@ -866,7 +866,7 @@ define(['exports'], (function (exports) { 'use strict';
         }
         {
           // We have a handler, meaning Workbox is going to handle the route.
-          // print the routing details to the console.
+          // print the routing details to the //console.
           logger.groupCollapsed(`Router is responding to: ${getFriendlyURL(url)}`);
           debugMessages.forEach(msg => {
             if (Array.isArray(msg)) {
@@ -897,7 +897,7 @@ define(['exports'], (function (exports) { 'use strict';
             // If there's a route catch handler, process that first
             if (catchHandler) {
               {
-                // Still include URL here as it will be async from the console group
+                // Still include URL here as it will be async from the //console group
                 // and may not make sense without the URL
                 logger.groupCollapsed(`Error thrown when responding to: ` + ` ${getFriendlyURL(url)}. Falling back to route's Catch Handler.`);
                 logger.error(`Error thrown by:`, route);
@@ -919,7 +919,7 @@ define(['exports'], (function (exports) { 'use strict';
             }
             if (this._catchHandler) {
               {
-                // Still include URL here as it will be async from the console group
+                // Still include URL here as it will be async from the //console group
                 // and may not make sense without the URL
                 logger.groupCollapsed(`Error thrown when responding to: ` + ` ${getFriendlyURL(url)}. Falling back to global Catch Handler.`);
                 logger.error(`Error thrown by:`, route);
@@ -2555,7 +2555,7 @@ define(['exports'], (function (exports) { 'use strict';
         {
           const cacheKey = params.cacheKey || (await handler.getCacheKey(request, 'read'));
           // Workbox is going to handle the route.
-          // print the routing details to the console.
+          // print the routing details to the //console.
           logger.groupCollapsed(`Precaching is responding to: ` + getFriendlyURL(request.url));
           logger.log(`Serving the precached url: ${getFriendlyURL(cacheKey instanceof Request ? cacheKey.url : cacheKey)}`);
           logger.groupCollapsed(`View request details here.`);

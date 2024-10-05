@@ -32,7 +32,7 @@ const ProfilePicture = ({location}) => {
     }
 
   return (
-    <div className='relative w-12 h-12 my-2 cursor-pointer bg-white overflow-hidden border border-gray-300' onClick={handleClick}>
+    <div className=' relative w-12 h-12 my-2 cursor-pointer bg-white overflow-hidden border border-gray-300' onClick={handleClick}>
         
             <figcaption>
             <img alt='dp' className="w-full h-full object-cover"  src={image} />  

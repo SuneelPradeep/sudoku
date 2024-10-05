@@ -2,12 +2,12 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import {firstSudoku, generateRandomSudoku, getDeepCopy } from '../utils/generateRandomSudoku'
 
 const Actions = ({currentLevel,setCurrentLevel,position,setPosition,showError,setShowError, sudokuArr,setSudokuArr,setInitialSudoku,initialSudoku}) => {
-  // console.log('the position is',position)
-  // console.log('the showerro is',showError);
+  // //console.log('the position is',position)
+  // //console.log('the showerro is',showError);
   
   
   const solver = (grid,row=0,col=0)=>{
-    // console.log('grid before solving',grid);
+    // //console.log('grid before solving',grid);
     
     // if current cell is already filled move ahead
     if(grid[row][col] !== -1){   
@@ -21,7 +21,7 @@ const Actions = ({currentLevel,setCurrentLevel,position,setPosition,showError,se
     //in all numbers checking valid accordingly with the num then getting next row and col and recursive function
      for(let num=1;num<=9;num++){
       if(checkValid(grid,row,col,num)){
-        // console.log('insolver checkingvalid',[row,col],num,'grid row col is',grid[row][col],'check row is ',grid[row].indexOf(num),'check col is ', grid.map(row=>row[col]).indexOf(num),'changed grid is ',grid);
+        // //console.log('insolver checkingvalid',[row,col],num,'grid row col is',grid[row][col],'check row is ',grid[row].indexOf(num),'check col is ', grid.map(row=>row[col]).indexOf(num),'changed grid is ',grid);
     
         grid[row][col] = num
         // get next row,col and repeate function 
@@ -35,7 +35,7 @@ const Actions = ({currentLevel,setCurrentLevel,position,setPosition,showError,se
       }
      }
   
-     // console.log('the final grid is',grid);
+     // //console.log('the final grid is',grid);
      
      // if its invalid fill with -1
      grid[row][col] = -1
@@ -99,7 +99,10 @@ const checkValid = (grid,row,col,num)=>{
 //  }
 
 const handleHint = () => {
-  let current = [...sudokuArr]; 
+
+  let current = [...sudokuArr]; let initial = [...initialSudoku]
+  //console.log('in here the current initial is ',current,initial);
+  
   let solved = solvedGrid;
   let res = {
     isComplete: false,
@@ -119,35 +122,43 @@ const handleHint = () => {
           res.hintRow = i;
           res.hintCol = j;
 
-          // console.log('the res in hint is',res, [res.hintRow,res.hintCol],res.value);
+          // //console.log('the res in hint is',res, [res.hintRow,res.hintCol],res.value);
           
           // Update the copied array with the hint value
           current[i][j] = res.value;
 
           // You can now update the state
-          setSudokuArr(current); // Update the state with the new grid
+          //console.log('in here bro ',current,initial);
           
+          setSudokuArr(current); // Update the state with the new grid
+          setInitialSudoku(initial)
+          //console.log('in here the current initial is222222222222 ',current,initial);
           return res; // Return the hint as soon as it's found
         }
       }
     }
   }
-
+  handleCheck()
   return res; 
 };
- 
+
+ const refereshData = ()=>{
+ // setShowError({text : '',error:false,color:'text-blue-400',row:'',col:''}) 
+   
+  let nextLevel = currentLevel?.level  ||  1;
+  localStorage.setItem('level',nextLevel+1)
+  setCurrentLevel({level : nextLevel + 1, completed : false})
+
+ }
  const handleNewGame = ()=>{
   let data = generateRandomSudoku();
   let newData = getDeepCopy(data)
-  setSudokuArr(newData)
-  setInitialSudoku(newData)
+  setSudokuArr(getDeepCopy(newData))
+  setInitialSudoku(getDeepCopy(newData))
   setShowError({text : '',error:false,color:'text-blue-400',row:'',col:''}) 
-   
-    let nextLevel = parseInt( localStorage.getItem('level'))
-    localStorage.setItem('level',nextLevel+1)
-    setCurrentLevel({level : nextLevel + 1, completed : false})
-
-  
+    
+  // setSolvedGrid(solver(newData)?.grid)
+  refereshData()
  }
  const handleReset = ()=>{
   let oldData = getDeepCopy(initialSudoku)
@@ -172,16 +183,17 @@ const handleHint = () => {
  }
  const handleCheck = ()=>{
       let data = solvedGrid;
+      // //console.log('the solved grid and others',solvedGrid,sudokuArr,initialSudoku,firstSudoku);
+ 
       let compare = compareSudoku (sudokuArr,data)
+      //console.log('the compare is ',compare,data,sudokuArr,initialSudoku);
       
       if(compare.isComplete){
-        setShowError({text : 'Congratulations!!! ', color :'text-green-500',error:false,row:position.row , col : position.col})
-        if(position?.started){
-        setCurrentLevel({level : currentLevel?.level, completed : true})
-         setTimeout(()=>{
-          handleNewGame()
-         },2500)
-        }
+        setShowError({text : 'Congratulations !!! ', color :'text-green-500',error:false,row:position.row , col : position.col})
+       setTimeout(()=>{
+        handleNewGame()
+       },2500)
+        // refereshData()
       }
       else if(compare.isSolvable ){
         setShowError({text : 'You are in a correct path,keep solving' , color :'text-blue-200',error:false,row:position.row , col : position.col})
@@ -194,31 +206,36 @@ const handleHint = () => {
         setShowError({text :'You are in wrong path!!! Remove the last entry !!! ', color :'text-red-500',error:true,row:position.row , col : position.col})
       }
  }
- const solvedGrid = useMemo(() => {
-  const result = solver(getDeepCopy(firstSudoku));
-  return result ? result.grid : firstSudoku; // Handle the case where solver returns null
-}, [firstSudoku]);
-    
-  
+ 
+//  const [ solvedGrid,setSolvedGrid] = useState(solver(getDeepCopy(initialSudoku))?.grid || initialSudoku )
+
+   const solvedGrid = useMemo(()=>{
+    let copyInitial = getDeepCopy(initialSudoku)
+    const data = solver(getDeepCopy(copyInitial))
+      return data?.grid
+   },[initialSudoku]) 
+// //console.log('the solved grid and others',solvedGrid,sudokuArr,initialSudoku,firstSudoku);
+ 
     
     useEffect(() => {
-     // console.log('here in useEffect 1 ');
+     // //console.log('here in useEffect 1 ');
       
       // if(position?.started){
-      //  console.log('here in useEffect 2222 ');
-        handleCheck();
+      //  //console.log('here in useEffect 2222 ');
+      
        // setPosition({row : position.row, col : position.col, started:false})
         
       // } 
+      handleCheck();
     }, [sudokuArr]);
 
   return (
 
     <div className="grid grid-flow-col gap-4">
         <div className="w-fill h-16 text-white bg-orange-400 p-4 rounded-3xl hover:scale-105  hover:-translate-x-4 ease-in-out "onClick={handleCheck}  > Check</div>
-      <div className="w-fill h-16 text-white bg-green-500 p-4 rounded-3xl hover:rotate-180 hover:skew-y-2  hover:-translate-y-4 ease-in-out "onClick={handleHint} > Hint</div>
-      <div className="w-fill h-16 text-white bg-red-500 p-4 rounded-3xl hover:-skew-x-2   hover:translate-y-4 ease-in-out "onClick={handleReset}  > Reset</div>
-      <button className={`w-fill h-16 text-white  p-4 rounded-3xl hover:translate-x-4  ease-in-out ${!currentLevel?.completed ? 'bg-gray-400' : 'bg-violet-500'}`} onClick={handleNewGame} disabled={!currentLevel?.completed}  > New Game</button>      
+      <div className="w-fill h-16 text-white bg-green-500 p-4 rounded-3xl hover:rotate-180 ease-in-out "onClick={handleHint} > Hint</div>
+      <div className="w-fill h-16 text-white bg-red-500 p-4 rounded-3xl hover:scale-105 ease-in-out "onClick={handleReset}  > Reset</div>
+      <button className={`w-fill h-16 text-white  p-4 rounded-3xl hover:scale-105  ease-in-out ${!currentLevel?.completed ? 'bg-gray-400' : 'bg-violet-500'}`} onClick={handleNewGame} disabled={!currentLevel?.completed}  > Next Level</button>      
       {/* <div className="w-fill h-16 text-white bg-violet-500 p-4 rounded-3xl hover:scale-110  ease-in-out "onClick={handleSolve}  > Solve</div>       */}
       
       </div>
